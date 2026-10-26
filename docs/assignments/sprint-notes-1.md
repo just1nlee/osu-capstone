@@ -17,14 +17,14 @@
 
 ## 2. What Got Done
 
-- **Where the work is tracked:** https://github.com/just1nlee/osu-capstone/tree/main
+- **Where the work is tracked:** https://github.com/just1nlee/osu-capstone/issues?q=is%3Aissue
 - **Done this sprint:**
-  - Created the project repository and project board.
-  - Began designing the hybrid multiplexer architecture.
-  - Researched approaches for training a classifier model to allow MediaPipe to recognize more hand gestures.
-  - Established a single terminal emulator as the first implementation milestone for the multiplexer.
-  - Met with the TA to discuss project direction and progress.
-  - Continued organizing and refining project documentation.
+  - Set up the repository with branch protection and required reviews
+  - Created issues for the repository using GitHub Issues
+  - RFC-001 (Justin): compares Electron, native C, and hybrid architectures for the multiplexer and recommends a native C multiplexer with an optional Electron companion app ([PR #1](https://github.com/just1nlee/osu-capstone/pull/1)).
+  - RFC-002 (Tobi): defines how users add custom hand gestures and map them to configurable keybindings ([PR #2](https://github.com/just1nlee/osu-capstone/pull/2)).
+  - RFC-003 (Havel): proposes a state machine between the recognizer and the multiplexer so a held gesture fires exactly one command and low-confidence frames fire nothing ([PR #4](https://github.com/just1nlee/osu-capstone/pull/4)).
+  - RFC-004 (Farzaan): compares glasses-mounted camera, webcam, EMG, and hybrid input and recommends a glasses-mounted camera with a webcam for early development ([PR #10](https://github.com/just1nlee/osu-capstone/pull/10)).
 
 ## 3. Top Risk and One Decision Needed
 
@@ -33,36 +33,29 @@
 
 ## 4. Contribution Lines
 
-One line per student, three parts:
-(a) the work you owned this sprint, one or more pieces, each with a link or ID (NDA teams: IDs only);
-(b) a review you gave (a pull request, spec, design, test plan, document, or dataset), with its link or ID where the review is recorded, and either the change you asked for or, for an approval, what you checked before approving ("LGTM" alone is not a review; if you reviewed nothing this sprint, say so);
-(c) one human-written sentence: the most consequential thing you shipped, and how the team knows it works.
-If a student has nothing this sprint, their line says so plainly. Mechanical changes (formatter runs, lockfile bumps,
-generated files, bulk renames) are normal work but are not evidence; leave them out.
-
 **Justin Lee**
 
 - owned: RFC-001: Electron vs CLI native vs Hybrid for Multiplexer Architecture [PR #1](https://github.com/just1nlee/osu-capstone/pull/1)
-- reviewed: Did not review anything this sprint
-- shipped: Drafted RFC-001, which looks into the different multiplexer architecture approaches and their pros and cons
+- reviewed: RFC-003: Deciding When a Recognized Gesture Becomes a Terminal Command [PR #4](https://github.com/just1nlee/osu-capstone/pull/4), RFC-004: Choosing an Input Method for Gesture Control [PR #10](https://github.com/just1nlee/osu-capstone/pull/10)
+- shipped: RFC-001 recommends a hybrid architecture, a native C multiplexer that runs in any terminal plus an optional Electron companion app, which gives the team a concrete proposal to vote on so the multiplexer core can start in Sprint 2. I confirmed the hybrid is feasible by running tmux inside VS Code’s xterm.js terminal and checking that Electron’s globalShortcut API can register a system-wide hotkey.
 
 **Havel Konda**
 
-- owned: Looking into CV model and gesture-recogntion strategy
-- reviewed: RFC-001: Electron vs CLI native vs Hybrid for Multiplexer Architecture [PR #1](https://github.com/just1nlee/osu-capstone/pull/1), RFC-002: Tobi's PR
-- shipped:
+- owned: RFC-003: Deciding When a Recognized Gesture Becomes a Terminal Command [PR #4](https://github.com/just1nlee/osu-capstone/pull/4)
+- reviewed: RFC-001: Electron vs CLI native vs Hybrid for Multiplexer Architecture [PR #1](https://github.com/just1nlee/osu-capstone/pull/1), RFC-002: Supporting Custom Hand Gestures and Configurable Keybindings [PR #2](https://github.com/just1nlee/osu-capstone/pull/2)
+- shipped: RFC-003 proposes a state machine between the recognizer and the multiplexer so that a held gesture fires exactly one command and low-confidence frames fire nothing, which gives everyone one shared definition of a “gesture event” to build against. I checked the design against what MediaPipe’s docs say the recognizer actually returns.
 
 **Tobi Kohn**
 
-- owned:
-- reviewed:
-- shipped:
+- owned: RFC-002: Supporting Custom Hand Gestures and Configurable Keybindings [PR #2](https://github.com/just1nlee/osu-capstone/pull/2)
+- reviewed: Did not review anything.
+- shipped: RFC-002 recommends letting users remap MediaPipe’s seven built-in gestures to their own keybindings instead of training a custom classifier, so we get real customization without model training, while keeping recognition and keybindings separate so custom gestures can be added later. It hasn’t been prototyped yet, but MediaPipe’s official docs confirm the built-in gesture set and show that Model Maker, the tool needed for a custom classifier, is deprecated.
 
 **Farzaan Wadiwalla**
 
-- owned: Looking into CV model and gesture-recognition strategy
-- reviewed:
-- shipped:
+- owned: RFC-004: Choosing an Input Method for Gesture Control [PR #10](https://github.com/just1nlee/osu-capstone/pull/10)
+- reviewed: Did not review anything.
+- shipped: RFC-004 recommends a glasses-mounted camera as the primary input, with a webcam for early development, so the recognition pipeline can start on hardware we already have without giving up the wearable goal. It hasn’t been validated yet, the first check is confirming the camera delivers usable frames to MediaPipe with the webcam as the fallback if it doesn’t.
 
 **Decision chaired this sprint:** who drove which decision to a conclusion. Over a term everyone should appear here at least once.
 
