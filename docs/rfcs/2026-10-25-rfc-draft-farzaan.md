@@ -1,4 +1,4 @@
-# RFC-002: Choosing an Input Method for Gesture Control
+# RFC-004: Choosing an Input Method for Gesture Control
 
 Project 60: Vision-Based Gesture Control for Terminal Multiplexers
 
@@ -6,14 +6,14 @@ Farzaan Wadiwalla <wadiwalf@oregonstate.edu>
 
 ---
 
-| Field | Value |
+| Field         | Value                                                   |
 | ------------- | ------------------------------------------------------- |
-| Author | Farzaan Wadiwalla |
-| Date | 2026-10-25 |
-| Status | Proposed |
-| Decision Date | (fill when decided) |
-| Deciders | Farzaan Wadiwalla, Havel Konda, Justin Lee, Tobias Kohn |
-| Superseded By | (link, if applicable) |
+| Author        | Farzaan Wadiwalla                                       |
+| Date          | 2026-10-25                                              |
+| Status        | Proposed                                                |
+| Decision Date | (fill when decided)                                     |
+| Deciders      | Farzaan Wadiwalla, Havel Konda, Justin Lee, Tobias Kohn |
+| Superseded By | (link, if applicable)                                   |
 
 ## Problem and Context
 
