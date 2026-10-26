@@ -1,4 +1,4 @@
-# RFC: Deciding When a Recognized Gesture Becomes a Terminal Command
+# RFC-003: Deciding When a Recognized Gesture Becomes a Terminal Command
 
 Project 60: Vision-Based Gesture Control for Terminal Multiplexers
 
