@@ -78,7 +78,7 @@ I propose Option C. It keeps the multiplexer independent of any front end, as in
 We will know it worked through these checks:
 
 1. **Headless command tests (every PR, in CI).** A harness replays recorded gesture commands against the multiplexer and compares the resulting layout to expected output. If this needs a real terminal attached, the core is coupled to its front end.
-2. **Runs anywhere (each release).** The multiplexer works with no companion app in at least two other terminal emulators. Programs like vim and htop should render without corruption in a multiplexed terminal pane.
+2. **Runs anywhere (each release).** The multiplexer works with no companion app in at least two other terminal emulators. Programs like vim and btop should render without corruption in a multiplexed terminal pane.
 3. **Companion app (end of Sprint 4).** The hotkey summons the dashboard and turns on the camera, and closing the app leaves the multiplexer running.
 4. **Fallback trigger.** If check 3 still fails at the start of winter term, we drop the companion app and continue as Option B.
 
