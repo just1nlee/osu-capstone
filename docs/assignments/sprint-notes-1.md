@@ -61,8 +61,8 @@ generated files, bulk renames) are normal work but are not evidence; leave them 
 **Farzaan Wadiwalla**
 
 - owned: Looking into CV model and gesture-recognition strategy
-- reviewed:
-- shipped:
+- reviewed: RFC-002: Input Method Comparison for Gesture Recognition
+- shipped: Nothing this sprint
 
 **Decision chaired this sprint:** who drove which decision to a conclusion. Over a term everyone should appear here at least once.
 
