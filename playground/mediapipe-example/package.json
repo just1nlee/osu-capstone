@@ -1,0 +1,16 @@
+{
+  "name": "gesture-control-poc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A small Electron and MediaPipe gesture control demonstration",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.35"
+  },
+  "devDependencies": {
+    "electron": "^45.1.0"
+  }
+}
