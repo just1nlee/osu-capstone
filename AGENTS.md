@@ -20,9 +20,23 @@ Project 60, CS 461/462, Oregon State University, 2026 to 2027. Mentor: Prof. Ale
 
 **Out of scope this year.** Wearable and EMG hardware, and an agent-driven command path. Wanted eventually, not now. Do not scaffold either.
 
+## Where to look
+
+Read these before proposing a change. This file does not repeat them.
+
+| Document | What it holds |
+| --- | --- |
+| `docs/requirements.md` | The problem, requirements by ID (FR-, NFR-, C-), non-goals, open questions |
+| `docs/design.md` | Architecture, the intent protocol, data, deployment, deferred decisions |
+| `docs/risks.md` | The only risk register, and the safety-net plan |
+| `docs/adr/` | Decisions and the options they rejected |
+| `CONTRIBUTING.md` | Workflow, Definition of Done, review rules |
+
+Cite requirement IDs in pull requests and test names. Do not change the intent protocol in `docs/design.md` without review from both container owners (risk R-4).
+
 ## Stack and conventions
 
-**The stack is not settled.** Do not assume a language, framework, or library. If a task needs one, ask rather than picking.
+**The architecture is decided; the toolchain is not.** The product is a C terminal multiplexer with a C terminal core that runs inside the user's own terminal, a separate headless gesture recognizer, and an optional Electron companion app ([ADR-0001](docs/adr/0001-hybrid-multiplexer-architecture.md)). The recognizer's language, the VT parsing library, and the build, lint, and test tools are still open, as listed under Deferred decisions in `docs/design.md`. If a task needs one of those, ask rather than picking.
 
 What is already decided:
 
@@ -64,11 +78,11 @@ You own the code you submit, whoever wrote the first draft. Read it, understand 
 
 ## To be added once code exists
 
-The repository also contains an experimental Electron/MediaPipe scaffold under `playground/mediapipe-example`; the product stack remains undecided. Each gap below has an owner and a sprint.
+The only runnable code is the checkpoint scaffold under `playground/mediapipe-example`, a spike that is not product code. Each gap below has an owner and a sprint.
 
 | Gap                                                                                                                    | Lands    | Owner             |
 | ---------------------------------------------------------------------------------------------------------------------- | -------- | ----------------- |
-| The stack: languages, frameworks, and why                                                                              | Sprint 1 | Justin Lee        |
+| The stack: languages, frameworks, and why. Architecture done in ADR-0001; recognizer language and toolchain still open | Sprint 2 | Justin Lee        |
 | Directory layout and module boundaries                                                                                 | Sprint 1 | Justin Lee        |
 | Build, run, and test commands                                                                                          | Sprint 1 | Justin Lee        |
 | The command schema: every gesture command, its payload, and its meaning                                                | Sprint 1 | Justin Lee        |
