@@ -63,7 +63,7 @@ These follow the ISO/IEC 25010 checklist. Interaction capability and flexibility
 - **NFR-3** (Must: below this, users stop trusting the gestures), reliability, provisional: Each supported gesture triggers its intended command in at least 90% of 20 attempts, per tester, on three different laptops under normal indoor lighting.
 - **NFR-4** (Must: a misfire interrupts work), reliability, provisional: Over 30 minutes of normal keyboard work with recognition on and no gestures attempted, the recognizer emits at most one command.
 - **NFR-5** (Must: video of people is the project's one sensitive asset), security: No camera frame is written to disk or sent over the network. Only labels, scores, timestamps, and derived landmark coordinates leave the recognizer.
-  Acceptance: during a 10-minute session, the recognizer process opens no network connection other than to the multiplexer on the same machine, and writes no image or video file.
+  Acceptance: during a 10-minute session, the recognizer process opens no connection to another host and writes no image or video file.
 - **NFR-6** (Must: terminal contents can include secrets), security: The channel that carries commands into the multiplexer accepts connections only from the user running it.
   Acceptance: a second local user account cannot connect to it.
 - **NFR-7** (Must: the team cannot test what it cannot run without a camera), maintainability: The recognizer's command logic and the multiplexer's layout logic each run their tests in CI with no camera, no display, and no human input.
