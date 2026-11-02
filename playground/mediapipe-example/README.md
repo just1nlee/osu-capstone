@@ -47,6 +47,10 @@ The matching MediaPipe runtime assets are installed with the npm package. When g
 
 Enable gesture control and allow the camera when prompted. On macOS, check **System Settings → Privacy & Security → Camera** if access is denied, and allow the Electron app; restart it after changing permission. When running from source, the Electron development app supplies its camera usage description. Other operating systems may require camera access to be enabled in their privacy settings too.
 
+## Tests and CI
+
+From this directory, run `npm test` after `npm ci`. The two tests launch the Electron window without the camera and check keyboard navigation and mouse color selection. The repository's [scaffold CI workflow](../../.github/workflows/ci.yml) runs these checks on pull requests and pushes to any branch using macOS. It does not test webcam recognition or produce a packaged build; see the [root README](../../README.md) for checkpoint limitations and evidence still needed.
+
 ## Usage
 
 - Click a color to select and apply it immediately.

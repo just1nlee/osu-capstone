@@ -6,7 +6,7 @@ Project 60, Vision-Based Gesture Control for Terminal Multiplexers. CS 461/462, 
 
 **Sprint key:** Sprint 1 = weeks 3 to 4. Sprint 2 = weeks 5 to 6. Sprint 3 = weeks 7 to 8. Sprint 4 = weeks 9 to 10.
 
-The repository holds documents only so far, and the stack is not settled. Anything below marked **Not yet built** does not exist today, and each one names who writes it and which sprint it lands in. Do not assume a command runs because it appears here.
+The product stack is not settled; `playground/mediapipe-example` is an experimental checkpoint scaffold. Anything below marked **Not yet built** does not exist today, and each one names who writes it and which sprint it lands in. Do not assume a command runs because it appears here.
 
 ## Code of Conduct
 
@@ -16,12 +16,12 @@ Raise a concern with the person directly, or with Havel Konda, Project Manager. 
 
 ## Getting Started
 
-Prerequisites, setup steps, and the command to run the app: **Not yet built.** Justin writes this section in Sprint 1, as the first code lands.
+See the root `README.md` for the checkpoint scaffold setup, launch, and test commands. Product setup is not yet defined.
 
 What works today:
 
 ```bash
-git clone https://github.com/just1nlee/gesture-control-mux.git
+git clone https://github.com/just1nlee/osu-capstone.git
 ```
 
 **Secrets.** Keep secrets in a local `.env` file. `.env` is gitignored and never committed. Commit a `.env.example` with placeholder keys so a new contributor knows which variables to set. Justin adds both in Sprint 1.
@@ -64,7 +64,7 @@ Until then, match the style of the code around you and do not reformat files you
 ## Testing
 
 - Ship a test in the same pull request as any change that adds or alters behavior. Formatting, docs, and comment changes need none.
-- Test types, the commands to run them, and the coverage threshold: **Not yet built.** Justin writes the commands in Sprint 1 and sets the coverage threshold in Sprint 2.
+- Run the scaffold tests with `npm test` from `playground/mediapipe-example`. Product test types and coverage thresholds are not yet defined.
 - No coverage threshold applies before Sprint 2. Enforcing one against an empty suite measures nothing.
 
 ## Definition of Done
@@ -73,7 +73,7 @@ A change merges only when every check below passes. A check marked **Not yet bui
 
 | Check                              | Enforced by                                              | Status        | Lands    | Owner             |
 | ---------------------------------- | -------------------------------------------------------- | ------------- | -------- | ----------------- |
-| Automated tests pass               | CI job `test` in `.github/workflows/ci.yml`              | Not yet built | Sprint 1 | Justin Lee        |
+| Automated tests pass               | CI job `test` in `.github/workflows/ci.yml`              | Scaffold only | Sprint 1 | Justin Lee        |
 | Lint and format clean              | CI job `lint` in `.github/workflows/ci.yml`              | Not yet built | Sprint 1 | Justin Lee        |
 | One approving review               | Branch protection rule on `main`                         | Not yet built | Sprint 1 | Justin Lee        |
 | Linked to an issue                 | Pull request template checkbox, `Closes #N`              | Not yet built | Sprint 1 | Havel Konda       |
@@ -112,7 +112,7 @@ Keep the norm workable: size issues to one sprint, review within 24 weekday hour
 
 ## CI/CD
 
-- Pipeline definition: `.github/workflows/ci.yml`. **Not yet built.** Justin adds it in Sprint 1.
+- Pipeline definition: `.github/workflows/ci.yml`. On pull requests and pushes to any branch, the `test` job installs the Electron scaffold dependencies and runs its two camera-free UI tests on macOS. It does not yet test the planned product, build a distributable, or exercise live gesture recognition. A passing GitHub Actions run on the submitted commit is still required for checkpoint evidence.
 - Mandatory jobs as each lands: `test` and `lint` in Sprint 1, `security` in Sprint 2.
 - Read logs and re-run failed jobs from the Actions tab of the repository.
 - Nothing merges to `main` with a failing required job. CI red on `main` for more than 48 hours triggers the conflict path in the Team Charter.
