@@ -6,7 +6,7 @@ Project 60, Vision-Based Gesture Control for Terminal Multiplexers. CS 461/462, 
 
 **Sprint key:** Sprint 1 = weeks 3 to 4. Sprint 2 = weeks 5 to 6. Sprint 3 = weeks 7 to 8. Sprint 4 = weeks 9 to 10.
 
-The product stack is not settled; `playground/mediapipe-example` is an experimental checkpoint scaffold. Anything below marked **Not yet built** does not exist today, and each one names who writes it and which sprint it lands in. Do not assume a command runs because it appears here.
+The architecture is decided in [ADR-0001](docs/adr/0001-hybrid-multiplexer-architecture.md) and described in `docs/design.md`; product code has not started, and `playground/mediapipe-example` is the checkpoint scaffold. Anything below marked **Not yet built** does not exist today, and each one names who writes it and which sprint it lands in. Do not assume a command runs because it appears here.
 
 ## Code of Conduct
 
@@ -57,7 +57,7 @@ Reference the issue in the pull request body with `Closes #42`, not in the commi
 
 ## Code Style, Linting & Formatting
 
-Formatter, linter, config file locations, and the commands to check and fix locally: **Not yet built.** Justin chooses the tools and writes this section in Sprint 1, once the stack is settled.
+Formatter, linter, config file locations, and the commands to check and fix locally: **Not yet built.** Justin chooses the tools and writes this section with the first multiplexer code, in Sprint 2.
 
 Until then, match the style of the code around you and do not reformat files you are not otherwise changing.
 

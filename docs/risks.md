@@ -47,13 +47,6 @@ The custom C terminal core (PTY handling and VT parsing) is the largest unknown 
 - Contingency: vendor libvterm or libghostty-vt for parsing and keep custom C work in the PTY and layout layers.
 - Trigger: the parser does not handle basic escape sequences by 2026-11-24.
 
-**R-6** technical, M/M (decision pending; the companion app is outside the skeleton).
-Architecture RFC-001 (C multiplexer, headless recognizer, optional companion app) is still Proposed, and the companion app framework (Electron or Wails) is undecided; until it is accepted, work on the boundaries may be redone.
-
-- Owner: Justin Lee
-- Mitigate: present RFC-001 for a decision at the mentor meeting on 2026-11-03; defer the framework choice to winter.
-- Trigger: RFC-001 not accepted by 2026-11-10.
-
 **R-7** team, M/M (one owner for the systems side; reviews spread the knowledge).
 All multiplexer and terminal core work is owned by one person; if they are away, the systems side stalls and nobody else can review or fix it.
 
@@ -142,5 +135,7 @@ Winter user sessions involve people outside the team; if the course requires an 
 3. **Bad intent schema change:** the schema carries a version, and each side rejects messages with a version it does not know rather than guessing, so reverting the schema pull request rolls both components back together. In effect from 2026-11-10.
 
 ## Closed
+
+**R-6** Architecture undecided: closed YYYY-MM-DD. The team accepted RFC-001, the hybrid (C multiplexer, headless recognizer, optional Electron companion app), recorded in ADR-0001.
 
 **R-16** Instruction team read access to the repository: not needed, because the repository is public.
