@@ -136,6 +136,6 @@ Winter user sessions involve people outside the team; if the course requires an 
 
 ## Closed
 
-**R-6** Architecture undecided: closed YYYY-MM-DD. The team accepted RFC-001, the hybrid (C multiplexer, headless recognizer, optional Electron companion app), recorded in ADR-0001.
+**R-6** Architecture undecided: closed 2026-10-28. The team accepted RFC-001, the hybrid (C multiplexer, headless recognizer, optional Electron companion app), recorded in ADR-0001.
 
 **R-16** Instruction team read access to the repository: not needed, because the repository is public.

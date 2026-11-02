@@ -15,7 +15,7 @@ Justin Lee <leeju8@oregonstate.edu>
 | Author        | Justin Lee                                              |
 | Date          | 2026-10-25                                              |
 | Status        | Accepted                                                |
-| Decision Date | YYYY-MM-DD                                              |
+| Decision Date | 2026-10-28                                              |
 | Deciders      | Farzaan Wadiwalla, Havel Konda, Justin Lee, Tobias Kohn |
 | Superseded By | (link, if applicable)                                   |
 
@@ -100,7 +100,7 @@ We will know it worked through these checks:
 
 ## Decision
 
-Accepted by team majority vote on YYYY-MM-DD: Option C, the hybrid. The companion app uses Electron. Recorded in [ADR-0001](../adr/0001-hybrid-multiplexer-architecture.md).
+Accepted by team majority vote on 2026-10-28: Option C, the hybrid. The companion app uses Electron. Recorded in [ADR-0001](../adr/0001-hybrid-multiplexer-architecture.md).
 
 ## References
 

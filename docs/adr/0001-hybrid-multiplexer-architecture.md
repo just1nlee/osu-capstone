@@ -2,7 +2,7 @@
 
 - Status: accepted
 - Deciders: Farzaan Wadiwalla, Havel Konda, Justin Lee, Tobias Kohn
-- Date: YYYY-MM-DD
+- Date: 2026-10-28
 
 ## Context and Problem Statement
 
