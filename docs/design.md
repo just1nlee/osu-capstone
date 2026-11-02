@@ -2,7 +2,9 @@
 
 ## Architecture
 
-The application uses a command bus:
+The following describes a proposed product architecture, not an implemented system or a final stack decision. The current runnable scaffold is described below.
+
+The proposed application uses a command bus:
 
 ```text
 Gesture recognizer ─┐

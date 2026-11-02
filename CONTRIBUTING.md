@@ -16,7 +16,7 @@ Raise a concern with the person directly, or with Havel Konda, Project Manager. 
 
 ## Getting Started
 
-See the root `README.md` for the checkpoint scaffold setup, launch, and test commands. Product setup is not yet defined.
+See the root `README.md` for the checkpoint scaffold setup, launch, and test commands. Product setup is not yet defined; Justin writes it when the product code lands.
 
 What works today:
 
@@ -64,7 +64,7 @@ Until then, match the style of the code around you and do not reformat files you
 ## Testing
 
 - Ship a test in the same pull request as any change that adds or alters behavior. Formatting, docs, and comment changes need none.
-- Run the scaffold tests with `npm test` from `playground/mediapipe-example`. Product test types and coverage thresholds are not yet defined.
+- Run the scaffold tests with `npm test` from `playground/mediapipe-example`. Product test types and coverage thresholds are not yet defined; Justin owns those decisions.
 - No coverage threshold applies before Sprint 2. Enforcing one against an empty suite measures nothing.
 
 ## Definition of Done

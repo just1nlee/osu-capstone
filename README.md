@@ -14,7 +14,8 @@ Install Node.js 22 or later and npm, then run:
 
 ```sh
 git clone https://github.com/just1nlee/osu-capstone.git
-cd osu-capstone/playground/mediapipe-example
+cd osu-capstone
+cd playground/mediapipe-example
 npm ci
 npm start
 ```
@@ -27,7 +28,7 @@ Run the camera-free scaffold checks with:
 npm test
 ```
 
-The [scaffold CI workflow](.github/workflows/ci.yml) is configured to run on every pull request and on pushes to `main`. On a macOS runner it installs the locked dependencies with `npm ci`, launches the Electron app, and runs two camera-free tests: keyboard navigation wraps without applying a color, and clicking a color selects and applies it. The app runs from source; CI does not produce a packaged build. These checks exercise the scaffold, not the planned multiplexer or live webcam recognition.
+The [scaffold CI workflow](.github/workflows/ci.yml) is configured to run on every pull request and on pushes to any branch. On a macOS runner it installs the locked dependencies with `npm ci`, launches the Electron app, and runs two camera-free tests: keyboard navigation wraps without applying a color, and clicking a color selects and applies it. The app runs from source; CI does not produce a packaged build. These checks exercise the scaffold, not the planned multiplexer or live webcam recognition.
 
 **Checkpoint evidence still needed:** the team must agree whether this experiment is an appropriate scaffold and whether its source-run check satisfies the build requirement. Push the commit selected for submission, confirm its CI run passes, and link that run on the PDF cover. A temporary broken-navigation check has failed locally, but a failing GitHub Actions run has not yet been demonstrated.
 
