@@ -20,16 +20,16 @@ Only the checkpoint scaffold in `playground/mediapipe-example` runs. It is a spi
 flowchart LR
     user([Developer at a laptop])
     cam[Built-in webcam]
-    host[Host terminal emulator<br/>Terminal.app, iTerm2, Ghostty]
+    host["Host terminal emulator<br/>Terminal.app, iTerm2, Ghostty"]
     shell[Shells and programs<br/>in each pane]
-    sys[[Gesture-controlled multiplexer]]
+    sys[["Gesture-controlled multiplexer"]]
 
-    user -- hand poses --> cam
-    cam -- frames --> sys
-    user -- keystrokes --> host
-    host -- keystrokes --> sys
-    sys -- composited screen --> host
-    sys <-- PTY I/O --> shell
+    user -->|"hand poses"| cam
+    cam -->|"frames"| sys
+    user -->|"keystrokes"| host
+    host -->|"keystrokes"| sys
+    sys -->|"composited screen"| host
+    sys <-->|"PTY I/O"| shell
 ```
 
 The system has no network dependency and no account. Everything runs on the user's machine (NFR-5).
@@ -39,22 +39,22 @@ The system has no network dependency and no account. Everything runs on the user
 ```mermaid
 flowchart LR
     cam[Webcam]
-    subgraph machine[User's macOS machine]
+    subgraph machine["User's macOS machine"]
         rec["Recognizer<br/>headless process<br/>MediaPipe hand tracking + gesture state machine"]
         mux["Multiplexer<br/>C, runs in the host terminal<br/>PTYs, terminal core, layout, compositor"]
         app["Companion app (winter, optional)<br/>Electron<br/>global hotkey + debug view"]
-        cfg[(Config file<br/>key bindings, gesture map)]
+        cfg[("Config file<br/>key bindings, gesture map")]
     end
     host[Host terminal]
 
-    cam -- frames, in memory only --> rec
-    rec -- "intents (JSON lines)<br/>Unix socket" --> mux
-    mux -- replies --> rec
-    host <-- "keystrokes / screen" --> mux
+    cam -->|"frames, in memory only"| rec
+    rec -->|"intents (JSON lines), Unix socket"| mux
+    mux -->|"replies"| rec
+    host <-->|"keystrokes / screen"| mux
     cfg --> mux
     cfg --> rec
-    app -. starts / stops .-> rec
-    app -. hosts as one terminal option .-> mux
+    app -.->|"starts / stops"| rec
+    app -.->|"hosts as one terminal option"| mux
 ```
 
 | Container | Responsibility | Owner |
