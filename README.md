@@ -6,7 +6,31 @@ Project 60, CS 461/462, Oregon State University, 2026 to 2027. Mentor: Prof. Ale
 
 ## Status
 
-**Documents only. No runnable code yet.** The stack is not settled; the candidate architectures are being compared in the RFCs and will be decided by team vote and recorded as an ADR. Setup, build, run, and test instructions will be added here as the first code lands.
+**The product stack is not settled.** Candidate architectures are being compared in the RFCs and will be decided by team vote and recorded as an ADR. The Electron/MediaPipe experiment under `playground/mediapipe-example` is a runnable checkpoint scaffold, not the terminal multiplexer or a stack decision.
+
+## Checkpoint scaffold quickstart
+
+Install Node.js 22 or later and npm, then run:
+
+```sh
+git clone https://github.com/just1nlee/osu-capstone.git
+cd osu-capstone
+cd playground/mediapipe-example
+npm ci
+npm start
+```
+
+The scaffold is a source-run desktop app with no separate compilation or packaging step. It demonstrates color controls and optional camera-based gesture recognition; see its [README](playground/mediapipe-example/README.md). A graphical desktop is needed to launch it. The MediaPipe model downloads when gesture control is enabled.
+
+Run the camera-free scaffold checks with:
+
+```sh
+npm test
+```
+
+The [scaffold CI workflow](.github/workflows/ci.yml) is configured to run on every pull request and on pushes to any branch. On a macOS runner it installs the locked dependencies with `npm ci`, launches the Electron app, and runs two camera-free tests: keyboard navigation wraps without applying a color, and clicking a color selects and applies it. The app runs from source; CI does not produce a packaged build. These checks exercise the scaffold, not the planned multiplexer or live webcam recognition.
+
+**Checkpoint evidence still needed:** the team must agree whether this experiment is an appropriate scaffold and whether its source-run check satisfies the build requirement. Push the commit selected for submission, confirm its CI run passes, and link that run on the PDF cover. A temporary broken-navigation check has failed locally, but a failing GitHub Actions run has not yet been demonstrated.
 
 ## What it does
 

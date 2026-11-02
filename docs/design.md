@@ -2,7 +2,9 @@
 
 ## Architecture
 
-The application uses a command bus:
+The following describes a proposed product architecture, not an implemented system or a final stack decision. The current runnable scaffold is described below.
+
+The proposed application uses a command bus:
 
 ```text
 Gesture recognizer ─┐
@@ -76,6 +78,10 @@ Normal use is local:
 The product does not require a cloud runtime. GitHub Actions may run tests,
 linting, security checks, and packaging checks, but camera data and terminal
 state remain on the user's computer.
+
+## Current checkpoint scaffold
+
+The separate `playground/mediapipe-example` Electron/MediaPipe experiment demonstrates gesture recognition and color selection. It is not the multiplexer described above and does not settle the production stack. CI checks this scaffold as described in the root README.
 
 ## Testing boundaries
 

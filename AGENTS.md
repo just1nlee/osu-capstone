@@ -64,7 +64,7 @@ You own the code you submit, whoever wrote the first draft. Read it, understand 
 
 ## To be added once code exists
 
-The repository holds documents only so far. Each gap below has an owner and a sprint.
+The repository also contains an experimental Electron/MediaPipe scaffold under `playground/mediapipe-example`; the product stack remains undecided. Each gap below has an owner and a sprint.
 
 | Gap                                                                                                                    | Lands    | Owner             |
 | ---------------------------------------------------------------------------------------------------------------------- | -------- | ----------------- |
