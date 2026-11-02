@@ -30,7 +30,7 @@ npm test
 
 The [scaffold CI workflow](.github/workflows/ci.yml) is configured to run on every pull request and on pushes to any branch. On a macOS runner it installs the locked dependencies with `npm ci`, launches the Electron app, and runs two camera-free tests: keyboard navigation wraps without applying a color, and clicking a color selects and applies it. The app runs from source; CI does not produce a packaged build. These checks exercise the scaffold, not the planned multiplexer or live webcam recognition.
 
-The tests catch a real break. On the throwaway branch `jl/ci-red-check`, removing the navigation wrap-around made the test step fail in CI ([run 41408859996](https://github.com/just1nlee/osu-capstone/actions/runs/41408859996)).
+The tests catch a real break. On a throwaway branch, removing the navigation wrap-around made the test step fail in CI ([run 41408859996](https://github.com/just1nlee/osu-capstone/actions/runs/41408859996)).
 
 ## What it does
 
