@@ -12,6 +12,7 @@ import mediapipe as mp
 
 DEFAULT_MODEL = Path(__file__).parents[1] / "models" / "gesture_recognizer.task"
 RUNNING_MODE = mp.tasks.vision.RunningMode.LIVE_STREAM
+TARGET_GESTURES = {"Open_Palm", "Closed_Fist", "Thumb_Up", "Thumb_Down"}
 
 
 def category_to_dict(category: Any) -> dict[str, Any]:
@@ -74,6 +75,15 @@ def print_live_result(
 ) -> None:
     """Print each live-stream result as derived JSON."""
     del output_image
+    detected_gestures = [
+        category
+        for hand in result.gestures
+        for category in hand
+        if category.category_name in TARGET_GESTURES
+    ]
+    if not detected_gestures:
+        return
+
     print(
         json.dumps(
             {
@@ -119,7 +129,11 @@ def run_live_stream(model_path: Path) -> None:
                 )
                 recognizer.recognize_async(mp_image, time.monotonic_ns() // 1_000_000)
 
-                cv2.imshow("MediaPipe Gesture Recognizer - press Q to quit", frame)
+                preview = cv2.flip(frame, 1)
+                cv2.imshow(
+                    "MediaPipe Gesture Recognizer - press Q to quit",
+                    preview,
+                )
                 if cv2.waitKey(1) & 0xFF == ord("q"):
                     break
     finally:
