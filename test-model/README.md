@@ -14,7 +14,7 @@ opens camera 0, prints each result as JSON, and shows a local preview. Press
 `Q` in the preview window to stop it. `IMAGE` is also implemented. `VIDEO` is
 not implemented yet.
 
-## Setup on Windows
+## Setup
 
 Use Python 3.9 or newer. MediaPipe `0.10.35` does not run on Python 3.8.
 Check the installed version before starting:
@@ -26,7 +26,18 @@ py --version
 If that reports Python 3.8, install Python 3.9 or newer and use that
 interpreter when creating the virtual environment.
 
-From the repository root, create and activate a virtual environment:
+From the repository root, create and activate a virtual environment.
+
+### macOS/Linux
+
+```sh
+python3 -m venv test-model/.venv
+source test-model/.venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r test-model/requirements.txt
+```
+
+### Windows
 
 ```powershell
 py -3 -m venv test-model\.venv
@@ -62,7 +73,7 @@ RUNNING_MODE = mp.tasks.vision.RunningMode.LIVE_STREAM
 ```
 
 ```powershell
-python test-model\src\recognize.py
+python test-model/src/recognize.py
 ```
 
 The preview runs continuously in real time, so gesture results may be printed
@@ -80,7 +91,7 @@ RUNNING_MODE = mp.tasks.vision.RunningMode.IMAGE
 ```
 
 ```powershell
-python test-model\src\recognize.py C:\path\to\hand.jpg
+python test-model/src/recognize.py C:\path\to\hand.jpg
 ```
 
 The first successful run should print a JSON object. A hand may produce a
