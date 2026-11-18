@@ -70,7 +70,15 @@ flowchart LR
 One process with five modules. Each can be tested without a real terminal (NFR-7).
 
 - **PTY manager:** forks a login shell per pane and reads and writes its PTY.
-- **Terminal core:** interprets each pane's output into a grid of cells. For the walking skeleton this handles only the escape sequences a shell prompt needs (R-5). Full VT parsing is a deferred decision, below.
+- **Terminal core:** interprets each pane's output into a grid of cells. Each pane keeps its own grid, even in the skeleton, because the compositor draws two panes side by side and cannot pass a pane's output straight through. For the walking skeleton the core handles only what the default macOS zsh prompt and line editing emit (R-5):
+
+  - C0 controls: CR, LF, BS, HT, and BEL (ignored).
+  - Cursor movement: CUP (`ESC [ row ; col H`), CUU, CUD, CUF, and CUB.
+  - Erase: ED (`ESC [ J`) and EL (`ESC [ K`).
+  - SGR (`ESC [ … m`): reset, bold, and the 16 basic colors. Other attributes are parsed and ignored.
+  - Any other escape sequence is consumed and ignored, so it never prints as text.
+
+  Full-screen programs such as `vim` and `btop` (FR-11) need more than this, so full VT parsing is a deferred decision, below.
 - **Layout tree:** a binary tree of splits whose leaves are panes. It also holds the focused pane and the active preset layout. Every intent is applied as one operation on this tree.
 - **Compositor:** draws the pane grids, borders, and status line into the host terminal, and redraws on output, resize, or a layout change.
 - **Input router:** sends keystrokes to the focused pane, except the prefix key and its bindings. It also reads the intent socket. Key bindings and socket intents go through the same command function, so both paths behave identically.
@@ -79,10 +87,13 @@ One process with five modules. Each can be tested without a real terminal (NFR-7
 
 ### Intent protocol (recognizer to multiplexer)
 
-This is the contract three components build against, so it is the most expensive thing in this document to change (R-4). It is a **draft until both container owners approve it** in the pull request that adds the schema file and its snapshot test, due 2026-11-10. After that, any change needs both owners' review through CODEOWNERS.
+This is the contract three components build against, so it is the most expensive thing in this document to change (R-4). It is a **draft until both container owners approve it** in the pull request that adds the schema file, its snapshot test, and the CODEOWNERS entry. That pull request was due 2026-11-10 and has not merged, so the R-4 trigger has fired. Until it merges, nothing should be built against this protocol beyond the walking skeleton's `focus_next`. After it merges, any change needs both owners' review through CODEOWNERS.
 
 - **Transport:** a Unix domain socket at `$TMPDIR/gesturemux-$UID/control.sock`, in a directory with mode `0700`, so only the user running the multiplexer can connect (NFR-6).
-- **Framing:** one JSON object per line, UTF-8. The multiplexer writes exactly one reply line per request line.
+- **Socket lifecycle:** on startup the multiplexer tries to connect to an existing `control.sock`. If that succeeds, another multiplexer owns it, so this one exits with an error. If it fails, the file is stale from a crash, so the multiplexer removes it and creates a new one. It removes the socket on a clean exit.
+- **One client at a time:** the multiplexer accepts one connection. A second connection gets the reply `{"v": 1, "ok": false, "error": "busy"}` and is closed. The first client keeps its connection.
+- **Framing:** one JSON object per line, UTF-8. The multiplexer writes exactly one reply line per request line. A line longer than 4 KiB is discarded up to its newline and gets a `bad_json` reply, so a client that never sends a newline cannot grow the read buffer without bound.
+- **Unknown fields are ignored.** A request may carry fields not listed below, and the multiplexer ignores them. This lets an optional field be added within version 1 without a version bump. A missing required field, or a listed field with the wrong type or value, is still `invalid_field`.
 - **Request:**
 
   ```json
@@ -103,7 +114,7 @@ This is the contract three components build against, so it is the most expensive
   | `next_layout` | Apply the next preset layout. No pane's process restarts. | FR-7 |
   | `close_pane` | Close the focused pane and end its process. | FR-8 |
 
-- **Reply:** `{"v": 1, "ok": true}` or `{"v": 1, "ok": false, "error": "<code>"}`, where `<code>` is `bad_json`, `unsupported_version`, `unknown_command`, or `invalid_field`. On any error the layout is unchanged (FR-9).
+- **Reply:** `{"v": 1, "ok": true}` or `{"v": 1, "ok": false, "error": "<code>"}`, where `<code>` is `bad_json`, `unsupported_version`, `unknown_command`, `invalid_field`, or `busy` (a second client, above). On any error the layout is unchanged (FR-9).
 - **Confidence stays in the recognizer.** The recognizer applies the thresholds before sending, including the higher one for `close_pane`. The multiplexer trusts that any well-formed intent is deliberate.
 
 ### Gesture state machine (inside the recognizer)
@@ -114,13 +125,15 @@ Continuous per-frame results become single commands here. This follows [RFC-003]
 stateDiagram-v2
     [*] --> Idle
     Idle --> Candidate: supported pose, confidence ≥ threshold
-    Candidate --> Idle: pose changes, confidence drops, or hand lost
+    Candidate --> Idle: pose changes, or pose absent ≥ release ms
     Candidate --> Fired: same pose held ≥ min stable ms → emit one intent
-    Fired --> Fired: same pose still held (emit nothing)
-    Fired --> Idle: pose released or hand lost
+    Fired --> Fired: same pose held, or absent < release ms (emit nothing)
+    Fired --> Idle: pose absent ≥ release ms
 ```
 
-Time is measured from frame timestamps, not frame counts, so the machine behaves the same at 15 fps and 30 fps (FR-4). The threshold, the destructive-command threshold, and the stability time are config values, not constants.
+"Absent" means a frame where the pose is not seen: tracking lost, no hand, or confidence below the threshold. A short dropout during a hold is normal, so a pose counts as released only after it has been absent for the release time. Without that, one lost frame during a held gesture would re-arm the machine and fire a second command, breaking FR-3. In Candidate, a dropout shorter than the release time does not reset the stability timer. A *different* supported pose above the threshold is not a dropout, and it moves Candidate back to Idle at once.
+
+Time is measured from frame timestamps, not frame counts, so the machine behaves the same at 15 fps and 30 fps (FR-4). The threshold, the destructive-command threshold, the stability time, and the release time are config values, not constants. The unit tests include a held pose with a one-frame dropout, which must emit exactly one command.
 
 ### Key scenario: focus the next pane (the walking skeleton)
 
@@ -155,7 +168,7 @@ sequenceDiagram
 | Camera frames | Recognizer memory only | One frame. Never written to disk or sent anywhere (NFR-5, C-4). |
 | Hand landmarks, pose label, confidence | Recognizer memory | Transient. Recorded landmark sequences are the test fixtures, committed as coordinates only. |
 | Layout tree, focused pane, pane grids | Multiplexer memory | The life of the multiplexer. Nothing is persisted, and detach/reattach is a non-goal. |
-| Command log (label, command, timestamp) | A local file, off by default | Only when switched on for SM-2 measurement. Contains no frames and no terminal contents. |
+| Command log (label, command, timestamp) | A local file written by the multiplexer, off by default | Only when switched on for SM-2 measurement. The multiplexer writes it because it sees both gesture and keyboard commands. Contains no frames and no terminal contents. |
 | Key bindings and gesture-to-command map | Config file in the user's config directory | Persistent, edited by the user (FR-15). Format is deferred. |
 
 Terminal contents can include secrets, so they never leave the multiplexer process and are not logged.
@@ -164,7 +177,7 @@ Terminal contents can include secrets, so they never leave the multiplexer proce
 
 **Production target.** The fall walking skeleton is a macOS build of the multiplexer and recognizer, published on the GitHub Releases page of `just1nlee/osu-capstone`. It counts as deployed when a person outside the team downloads it onto their own Mac, installs it by following the release notes alone, and completes the FR-5 focus action (NFR-8, SM-3), by fall week 10 (2026-11-30 to 2026-12-06). The skeleton is the thinnest end-to-end slice: one gesture moves focus between two panes (R-1). The companion app is not in it. Justin Lee owns the GitHub repository and its Releases. Havel Konda finds the outside volunteer (R-13). Prof. Guyer, standing in for a partner on this student-proposed project, was asked to agree this target on 2026-11-01 and is expected to confirm it at the mentor meeting on 2026-11-03 (R-12). Builds are unsigned this fall, so the release notes include the one step needed to open an unsigned app on macOS (R-9, C-7).
 
-**Where changes are tried first.** Every pull request runs CI. Each release candidate is published as a GitHub pre-release and installed on a team laptop other than its author's before it is promoted. The first pre-release is due 2026-11-22. The full gate and rollback plan is the safety-net plan in `docs/risks.md`.
+**Where changes are tried first.** Every pull request runs CI. Each release candidate is published as a GitHub pre-release and installed on a team laptop other than its author's before it is promoted. The first pre-release is due 2026-11-22, and it ships with the skeleton's minimal terminal core described above, whatever the VT parsing decision on 2026-11-24 turns out to be. That pre-release is gated on FR-5 and the outside install, not on full-screen programs (FR-11) or output speed (NFR-2). The full gate and rollback plan is the safety-net plan in `docs/risks.md`.
 
 **Runtime shape.** The user starts the multiplexer in their terminal, and it creates the socket. The recognizer is started separately, or later by the companion app. macOS asks for camera permission on first use.
 
@@ -172,7 +185,7 @@ Terminal contents can include secrets, so they never leave the multiplexer proce
 
 Each is deferred on purpose because it is cheap to reverse or not needed for the skeleton. Each gets an ADR when it is made.
 
-- **VT parsing: our own parser or a library (libvterm or libghostty-vt).** The skeleton's terminal core handles only a shell prompt. Decided by the R-5 trigger date, 2026-11-24.
+- **VT parsing: our own parser or a library (libvterm or libghostty-vt).** The skeleton's terminal core handles only a shell prompt. Decided by the R-5 trigger date, 2026-11-24. This comes after the first pre-release on purpose: that pre-release ships with the minimal core, and the decision applies from the second pre-release on.
 - **The recognizer's language and how it is packaged** into a release that installs on a machine without a development setup. Needed before the first pre-release, 2026-11-22.
 - **Gesture classification: MediaPipe's predefined gestures or our own classifier on landmarks.** This is an open question in the requirements, answered by the R-2 spike. Only the recognizer's internals change, because the intent protocol does not carry poses as commands.
 - **Which pose maps to which command.** It is a config value, so it can change without touching code.
@@ -183,6 +196,8 @@ Each is deferred on purpose because it is cheap to reverse or not needed for the
 
 ## Open technical questions
 
+- **Which process owns the recognition toggle (FR-13)?** The multiplexer owns the key bindings, but the recognizer holds the camera, and the protocol has no message from the multiplexer to the recognizer. The options are in [ADR-0002](adr/0002-recognition-toggle-owner.md), which is Proposed. Decided by team vote before the RFC final.
+
 - **Is the compositor fast enough?** Can it redraw several busy panes within NFR-2's 2× bound? Measure it on the skeleton with a 10 MB `cat`. Owner: Justin Lee, by 2026-11-24.
 - **Which app owns the camera permission?** On macOS, a process started from a terminal may have its camera permission attributed to the terminal emulator rather than the recognizer, which would change the install steps. Spike it before the first pre-release. Owner: Farzaan Wadiwalla, by 2026-11-22.
 - **Is cell-based feedback clear enough?** Can a user see which pane has focus and what command just ran from borders and a status line alone (FR-12)? Answered in the first team testing of the skeleton. Owner: Havel Konda.
@@ -191,6 +206,6 @@ Each is deferred on purpose because it is cheap to reverse or not needed for the
 ## Testing
 
 - **Recognizer:** unit-test the state machine and thresholds with synthetic label/confidence/timestamp sequences, and the recognition path with recorded landmark fixtures. No camera is needed (NFR-7).
-- **Multiplexer:** unit-test layout-tree operations and intent validation. Integration-test by replaying intent lines into the socket of a headless multiplexer and comparing the resulting layout tree to the expected one. No host terminal or display is needed.
+- **Multiplexer:** unit-test layout-tree operations and intent validation. Integration-test by replaying intent lines into the socket of a headless multiplexer and comparing the resulting layout tree to the expected one. **Headless** means the test harness starts the multiplexer on a pseudo-terminal it owns instead of a real host terminal, with a test-only flag that makes the multiplexer write its layout tree and focused pane as JSON to a file after each command. The harness reads that file and discards the screen output. No host terminal or display is needed.
 - **Protocol:** a snapshot test of the schema file fails on any change, so a contract change cannot merge unnoticed (R-4).
 - **Manual, per release:** live webcam recognition, rendering `vim` and `btop` in two host terminals (FR-11), and the outside install (NFR-8).
