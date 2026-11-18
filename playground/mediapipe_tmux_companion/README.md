@@ -14,12 +14,20 @@ Run these commands from the repository root on macOS.
 brew install tmux
 cd playground/mediapipe_tmux_companion
 npm ci
-npm start
+./start-companion.sh
 ~~~
+
+[The launcher](start-companion.sh) creates or reuses the `work` session on the named socket `gesture-demo`, starts the companion on that socket, and attaches your terminal. The companion selects `work` automatically when it is the only session on the server. If several sessions share that socket, choose one in the companion’s dropdown. The camera starts off on a fresh launch.
+
+If the companion is already using another socket, quit it from the menu bar before running the launcher. A second launch reopens the existing instance with its current socket and selection. Startup output goes to `${TMPDIR:-/tmp}/tmux-companion.log`.
+
+### Start tmux and the companion separately
+
+Run `npm start` from the companion directory to open the companion on its own. It uses the default tmux socket unless you set it explicitly.
 
 Start tmux from your normal terminal with **tmux new-session -s work** or attach to an existing session. If the companion is already open, click **Refresh sessions**. If the first nonempty session list contains one entry, the app selects it automatically. With multiple entries, choose one in the dropdown. Detached sessions also appear. The app keeps a valid selection across renames and new sessions. If the selection is lost, choose a session explicitly to resume gesture actions.
 
-The app looks at the default local tmux server. To use a named server, point the terminal and companion at the same socket. Run the tmux and npm commands in separate terminals, with the npm command run from the companion directory. An explicit socket path uses `tmux -S` and `TMUX_COMPANION_SOCKET_PATH`. [Socket selection](docs/TMUX_INTEGRATION.md#discovery-and-selection)
+To use a named server, point the terminal and companion at the same socket. Run the tmux and npm commands in separate terminals, with the npm command run from the companion directory. An explicit socket path uses `tmux -S` and `TMUX_COMPANION_SOCKET_PATH`. [Socket selection](docs/TMUX_INTEGRATION.md#discovery-and-selection)
 
 ~~~sh
 tmux -L gesture-demo new-session -s work
@@ -111,7 +119,7 @@ npm run test:app
 ~~~
 
 - **npm test** covers selection, persistence, command preparation, gesture stabilization, hold timing, and shared model routing.
-- **npm run test:tmux** uses real disposable tmux servers to check discovery, target resolution, pane moves, error reporting, and close safeguards.
+- **npm run test:tmux** uses real disposable tmux servers to check discovery, target resolution, pane moves, error reporting, close safeguards, and launcher session reuse.
 - **npm run test:app** needs the shared model file, a graphical macOS desktop, Python 3, and a real tmux binary. It checks Electron startup, IPC, settings, local MediaPipe inference with generated video, and background dispatch with a tmux client attached to a test PTY. It injects a synthetic pose label into one part of the test. A physical-camera and real-pose check is a separate manual step.
 - Set `TMUX_TEST_BINARY` to the absolute path of a tmux executable to run against that version. Without it, the integration suite resolves tmux through its normal binary lookup, and the app smoke test uses tmux on `PATH`.
 

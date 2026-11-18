@@ -2,9 +2,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
-const { mkdtemp, rm, access } = require('node:fs/promises');
+const { mkdtemp, rm, access, readFile, writeFile } = require('node:fs/promises');
 const { tmpdir } = require('node:os');
-const { join } = require('node:path');
+const { dirname, join, resolve } = require('node:path');
+const { setTimeout: delay } = require('node:timers/promises');
 const { createTmuxClient, resolveTmuxPath } = require('../electron/tmux.cjs');
 const exec = promisify(execFile);
 
@@ -182,4 +183,69 @@ test('explicit cross-session pane targets are repinned during a guarded hold', a
   await raw('swap-pane', '-s', 'other:.0', '-t', 'other:.1');
   time = 1000;
   assert.equal((await dispatcher.dispatch({ ...request, phase: 'commit' })).code, 'stale_target');
+});
+
+
+test('launcher reuses the same tmux session and passes its socket to npm', async t => {
+  const candidate = process.env.TMUX_TEST_BINARY || await resolveTmuxPath();
+  const binary = candidate === 'tmux' ? (await exec('which', ['tmux'])).stdout.trim() : resolve(candidate);
+  const folder = await mkdtemp('/tmp/companion-launch-');
+  const launcher = resolve(__dirname, '../start-companion.sh');
+  const env = {
+    ...process.env,
+    PATH: folder + ':' + process.env.PATH,
+    TMPDIR: folder,
+    TMUX_TMPDIR: folder,
+    TMUX_COMPANION_SOCKET_PATH: '/unused/override',
+    COMPANION_LAUNCH_TEST_TMUX: binary,
+  };
+  delete env.TMUX;
+  delete env.TMUX_PANE;
+  const raw = (...args) => exec(binary, ['-L', 'gesture-demo', ...args], { env, timeout: 4000 });
+  t.after(async () => {
+    await raw('-N', 'kill-server').catch(() => {});
+    await rm(folder, { recursive: true, force: true });
+  });
+
+  // Record the interactive attach, which requires a TTY, and run setup against real tmux.
+  await writeFile(join(folder, 'tmux'), [
+    '#!/bin/sh',
+    'if [ "$3" = attach-session ]; then',
+    '  printf "%s\\n" "$@" > "$TMPDIR/attach-args"',
+    '  exit 0',
+    'fi',
+    'exec "$COMPANION_LAUNCH_TEST_TMUX" -f /dev/null "$@"',
+    '',
+  ].join('\n'), { mode: 0o700 });
+  await writeFile(join(folder, 'npm'), [
+    '#!/bin/sh',
+    'echo "startup log"',
+    'printf "%s|%s|%s|%s\\n" "$PWD" "$1" "$TMUX_COMPANION_SOCKET_NAME" "${TMUX_COMPANION_SOCKET_PATH-unset}" >> "$TMPDIR/npm-launches"',
+    '',
+  ].join('\n'), { mode: 0o700 });
+
+  let pane;
+  for (const count of [1, 2]) {
+    await exec(launcher, [], { cwd: folder, env, timeout: 4000 });
+    const launchesPath = join(folder, 'npm-launches');
+    let launches = [];
+    for (let attempt = 0; attempt < 80; attempt++) {
+      const log = await readFile(launchesPath, 'utf8').catch(error => {
+        if (error.code === 'ENOENT') return '';
+        throw error;
+      });
+      launches = log.trim().split('\n').filter(Boolean);
+      if (launches.length === count) break;
+      await delay(25);
+    }
+    assert.deepEqual(launches, Array(count).fill(dirname(launcher) + '|start|gesture-demo|unset'));
+    assert.equal(await readFile(join(folder, 'attach-args'), 'utf8'), '-L\ngesture-demo\nattach-session\n-t\n=work\n');
+    const sessions = await raw('list-sessions', '-F', '#{session_id} #{session_name}');
+    assert.equal(sessions.stdout, '$0 work\n');
+    const current = (await raw('list-panes', '-t', '=work:', '-F', '#{pane_pid}')).stdout.trim();
+    assert.match(current, /^\d+$/);
+    if (pane) assert.equal(current, pane);
+    pane = current;
+  }
+  assert.equal(await readFile(join(folder, 'tmux-companion.log'), 'utf8'), 'startup log\n');
 });

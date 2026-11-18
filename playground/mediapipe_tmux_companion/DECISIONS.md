@@ -18,6 +18,6 @@ These decisions apply to the standalone tmux experiment. The capstone’s team-a
 
 ## Deferred lifecycle options
 
-The current spike allows targeting a detached session while that session still exists. Pausing on last detach, following a specific client, following the foreground terminal, monitoring display sleep independently of system sleep, and launching both processes through a dedicated wrapper remain possible follow-ups. The companion and tmux each keep their own process lifecycle.
+The current spike allows targeting a detached session while that session still exists. Pausing on last detach, following a specific client, following the foreground terminal, and monitoring display sleep independently of system sleep remain possible follow-ups. The [shell launcher](README.md#start) starts both processes on the same socket. The companion and tmux each keep their own process lifecycle.
 
 See [tmux integration](docs/TMUX_INTEGRATION.md), [MediaPipe recognition](docs/MEDIAPIPE_RECOGNITION.md), and [gesture mappings](docs/GESTURE_MAPPINGS.md) for current behavior.
