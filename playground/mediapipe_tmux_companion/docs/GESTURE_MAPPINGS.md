@@ -6,7 +6,7 @@ The mapping panel renders one fixed row for each supported pose. Every row start
 
 1. Start or attach to tmux in a regular terminal. Select the session in the companion.
 2. Pick a command in the appropriate gesture row. Provide any field that appears.
-3. Click **Check settings**. The companion resolves live targets and reports any missing prerequisite before execution.
+3. Click **Check settings**. The companion resolves live targets and reports the prerequisites it can check without execution.
 4. Click **Save mappings**. Turn the camera on and perform the pose. Release it between actions. Only saved, enabled rows can trigger.
 5. Check **Last action** or the recognition log for the outcome.
 
@@ -25,7 +25,7 @@ Bare `move-pane` can resolve source and target to the same pane. Guided mode sup
 
 Turn on **Use advanced arguments** under **Advanced options**. Enter one literal argument per line. Spaces within one line stay in the same argument, and blank lines are ignored. The row shows usage obtained from the installed tmux server. Explicit overrides may affect another session. Server-wide and nested commands can affect more than one session.
 
-**Allow closing and guarded commands** starts unchecked and stays checked until you clear it or quit. Reviewed guided commands can fire after stabilization. Other commands, including pane moves, direct close commands, and Advanced mode, require a one-second hold after stabilization. Changing the target, camera state, saved mapping, or guard cancels pending attempts. Guarded pane moves pin their source and destination. Keyboard bindings stay under tmux’s control.
+**Allow closing and guarded commands** starts unchecked and stays checked until you clear it or quit. Reviewed guided commands can fire after stabilization. Other commands, including pane moves, direct close commands, and Advanced mode, require a one-second hold after stabilization. Changing the target, camera state, saved mapping revision, or guard cancels pending attempts. Guarded pane moves pin their source and destination. Keyboard bindings stay under tmux’s control.
 
 ## Persistence and dispatch payload
 
@@ -43,6 +43,6 @@ Electron stores `gesture-mappings.v1.json` in its `userData` directory. The JSON
 }
 ~~~
 
-[Config validation](../shared/config.js) checks the fixed roster and binding structure. Commands accept up to 32 advanced arguments of up to 512 characters each. [Command validation](../shared/commands.js) checks required options. [Settings storage](../electron/settings.cjs) serializes saves and atomically replaces the file. A successful save publishes a new revision, and a failed save retains the last active revision. A command removed from the catalog can remain in the saved file, but dispatch needs the active server to advertise it.
+[Config validation](../shared/config.js) checks the fixed roster and binding structure. Commands accept up to 32 advanced arguments of up to 512 characters each. [Command validation](../shared/commands.js) checks required options. [Settings storage](../electron/settings.cjs) serializes saves and atomically replaces the file. A successful save publishes a new in-memory revision, and a failed save retains the last active revision. Revisions start over at app launch. A command removed from the catalog can remain in the saved file, but dispatch needs the active server to advertise it.
 
 The renderer sends the gesture label, saved revision, selected target token, camera generation, and optional hold phase and ID. Main uses the saved row and validates the request again before constructing argv.

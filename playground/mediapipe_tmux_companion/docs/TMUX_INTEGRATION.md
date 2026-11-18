@@ -23,23 +23,23 @@ The adapter clears inherited `TMUX` and `TMUX_PANE` and preserves `TMUX_TMPDIR`.
 
 | Discovery result | Companion behavior |
 | --- | --- |
-| No session | Shows an empty state. **Refresh sessions** supports starting tmux later. |
-| One initial session | Selects it automatically. |
-| Multiple initial sessions | Waits for a dropdown choice. |
+| No session at startup | Shows an empty state. **Refresh sessions** supports starting tmux later. |
+| One session in the first nonempty list | Selects it automatically. |
+| Multiple sessions in the first nonempty list | Waits for a dropdown choice, even if only one remains before you choose. |
 | A valid selection is renamed or another session appears | Retains the existing selection. |
-| The selected session disappears or the server restarts | Clears the target, cancels a pending hold, and requires a new explicit choice. |
+| An existing selection is lost because its session disappears, discovery fails, or the server restarts | Clears the target, cancels a pending hold, and requires a new explicit choice. |
 
 The companion refreshes the selected session every three seconds. Attached and detached sessions both appear in the picker. Closing the terminal can leave a detached session alive, so ordinary gesture commands remain eligible. Ending the session makes its identity invalid. Quitting the companion leaves tmux running.
 
 ## Command dispatch
 
-1. Read supported command names and usage with `list-commands -F`. The catalog belongs to the installed server version.
+1. Read supported command names and usage with `list-commands -F`. The catalog reflects the running server version. A discovered server identity change invalidates the cached catalog for dispatch.
 2. Verify the selected session identity and get its window and pane layout with scoped `list-windows` and `list-panes`. Query `list-clients` for commands that need a client. Where an implicit client is required, exactly one eligible client must be available.
 3. Prepare argv with [the command adapter](../shared/commands.js). Resolve IDs such as `$0`, `@1`, and `%2` against live state. Guided commands have contextual defaults and explicit advanced options can override targets. **Check settings** uses the same preparation path without running the command.
 4. [Dispatch](../electron/dispatch.cjs) rechecks the saved mapping revision, target token, camera generation, and guard after asynchronous lookups. Main runs one action at a time. Guarded actions use `begin`, `commit`, and `cancel` with an attempt ID and pinned targets.
 5. Invoke `execFile(binary, argv)`. Each call has a 750 ms timeout and a 64 KiB output limit. The adapter encodes a final semicolon for tmux’s own argv parser. The log shows the outcome and bounded, sanitized tmux errors. A timeout leaves the outcome uncertain and triggers no automatic retry.
 
-The [preload bridge](../electron/preload.cjs) exposes fixed methods under `window.gestureCompanion`. The renderer supplies a gesture label and state tokens. Main resolves the saved command and builds argv. Application data stays on the local machine. The UI has no terminal stream and does not display action stdout.
+The [preload bridge](../electron/preload.cjs) exposes fixed methods under `window.gestureCompanion`. The renderer supplies a gesture label and state tokens. Main resolves the saved command and builds argv. Camera frames and model results stay in the renderer. The adapter uses the local tmux socket, and the UI displays action status and errors.
 
 Direct pane, window, and session closes use the selected target and a tmux-side recheck. `kill-pane` protects the only pane in a window. Explicit target overrides, server-wide commands, linked windows, and commands that accept nested commands can have effects beyond the selected session. Commands such as `attach-session` need an interactive terminal.
 
