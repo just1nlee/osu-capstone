@@ -125,7 +125,7 @@ Winter user sessions involve people outside the team; if the course requires an 
 
 ### Where changes are exercised before they reach users
 
-1. **Every pull request:** CI (Scaffold CI, GitHub Actions on macos-latest) installs the scaffold and runs its behavior tests. In place.
+1. **Every pull request:** Companion CI runs the companion's unit, real-tmux integration, and Electron smoke tests on macOS. The smoke test uses a synthetic recognizer and requires no camera or model file.
 2. **Pre-release builds:** each release candidate is published to GitHub Releases marked as a pre-release and installed on a team laptop other than the author's before it is promoted to a full release. First pre-release by 2026-11-22.
 
 ### How a bad change is undone

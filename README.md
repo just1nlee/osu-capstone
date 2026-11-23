@@ -28,9 +28,9 @@ Run the camera-free scaffold checks with:
 npm test
 ```
 
-The [scaffold CI workflow](.github/workflows/ci.yml) is configured to run on every pull request and on pushes to any branch. On a macOS runner it installs the locked dependencies with `npm ci`, launches the Electron app, and runs two camera-free tests: keyboard navigation wraps without applying a color, and clicking a color selects and applies it. The app runs from source; CI does not produce a packaged build. These checks exercise the scaffold, not the planned multiplexer or live webcam recognition.
+The local scaffold tests cover keyboard navigation and color selection. The [repository CI workflow](.github/workflows/ci.yml) runs the [tmux gesture companion tests](playground/mediapipe_tmux_companion/README.md#verify) on every pull request and push. It uses a real tmux server and a synthetic recognizer to check the companion's command path without a webcam or the MediaPipe model.
 
-The tests catch a real break. On a throwaway branch, removing the navigation wrap-around made the test step fail in CI ([run 41408859996](https://github.com/just1nlee/osu-capstone/actions/runs/41408859996)).
+The scaffold tests caught a deliberately broken navigation wrap-around when they ran in the earlier [scaffold CI workflow](https://github.com/just1nlee/osu-capstone/actions/runs/41408859996).
 
 ## What it does
 

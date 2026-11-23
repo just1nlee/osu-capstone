@@ -49,7 +49,7 @@ Enable gesture control and allow the camera when prompted. On macOS, check **Sys
 
 ## Tests and CI
 
-From this directory, run `npm test` after `npm ci`. The two tests launch the Electron window without the camera and check keyboard navigation and mouse color selection. The repository's [scaffold CI workflow](../../.github/workflows/ci.yml) runs these checks on pull requests and pushes to any branch using macOS. It does not test webcam recognition or produce a packaged build; see the [root README](../../README.md) for checkpoint limitations and evidence still needed.
+From this directory, run `npm test` after `npm ci`. The two local tests launch the Electron window without the camera and check keyboard navigation and mouse color selection. The [repository CI workflow](../../.github/workflows/ci.yml) runs the [tmux companion tests](../mediapipe_tmux_companion/README.md#verify).
 
 ## Usage
 

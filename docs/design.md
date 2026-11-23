@@ -10,7 +10,7 @@ The architecture is the hybrid option in [RFC-001](rfcs/2026-11-22-rfc-final-jus
 
 ## What exists today
 
-Two early pieces of the multiplexer exist under `terminal-emulator/`: `main.c` runs one shell in a PTY, and `bus/` is the command bus. The bus implements the intent protocol below, but for now it only prints each command it receives (`bin/command-bus`). Apart from those, only the checkpoint scaffold in `playground/mediapipe-example` runs. It is a spike: an Electron window that runs MediaPipe's gesture recognizer on the webcam and uses the result to pick a color. CI (`.github/workflows/ci.yml`) launches it on macOS and runs two camera-free UI tests. None of the components below is complete yet, and the scaffold is not one of them. Its finding (MediaPipe's predefined gestures run in real time on a team laptop) goes into an ADR, and then the scaffold is deleted.
+Two early pieces of the multiplexer exist under `terminal-emulator/`. `main.c` runs one shell in a PTY, and `bus/` implements the intent protocol below and prints each command it receives (`bin/command-bus`). The checkpoint scaffold in `playground/mediapipe-example` is an Electron color picker that demonstrates MediaPipe gesture recognition. The team plans to record the scaffold's finding in an ADR and then remove it. The [tmux gesture companion](../playground/mediapipe_tmux_companion/README.md) is a separate prototype for mapping gestures to pane commands. [Companion CI](../.github/workflows/ci.yml) exercises the prototype with real tmux and synthetic gesture results on macOS.
 
 ## Architecture
 
