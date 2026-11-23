@@ -10,7 +10,7 @@ The architecture is the hybrid option in [RFC-001](rfcs/2026-10-25-rfc-draft-jus
 
 ## What exists today
 
-Only the checkpoint scaffold in `playground/mediapipe-example` runs. It is a spike: an Electron window that runs MediaPipe's gesture recognizer on the webcam and uses the result to pick a color. CI (`.github/workflows/ci.yml`) launches it on macOS and runs two camera-free UI tests. None of the components below exist yet, and the scaffold is not one of them. Its finding (MediaPipe's predefined gestures run in real time on a team laptop) goes into an ADR, and then the scaffold is deleted.
+Two early pieces of the multiplexer exist under `terminal-emulator/`: `main.c` runs one shell in a PTY, and `bus/` is the command bus. The bus implements the intent protocol below, but for now it only prints each command it receives (`bin/command-bus`). Apart from those, only the checkpoint scaffold in `playground/mediapipe-example` runs. It is a spike: an Electron window that runs MediaPipe's gesture recognizer on the webcam and uses the result to pick a color. CI (`.github/workflows/ci.yml`) launches it on macOS and runs two camera-free UI tests. None of the components below is complete yet, and the scaffold is not one of them. Its finding (MediaPipe's predefined gestures run in real time on a team laptop) goes into an ADR, and then the scaffold is deleted.
 
 ## Architecture
 
@@ -91,30 +91,33 @@ This is the contract three components build against, so it is the most expensive
 
 - **Transport:** a Unix domain socket at `$TMPDIR/gesturemux-$UID/control.sock`, in a directory with mode `0700`, so only the user running the multiplexer can connect (NFR-6).
 - **Socket lifecycle:** on startup the multiplexer tries to connect to an existing `control.sock`. If that succeeds, another multiplexer owns it, so this one exits with an error. If it fails, the file is stale from a crash, so the multiplexer removes it and creates a new one. It removes the socket on a clean exit.
-- **One client at a time:** the multiplexer accepts one connection. A second connection gets the reply `{"v": 1, "ok": false, "error": "busy"}` and is closed. The first client keeps its connection.
+- **Multiple clients:** the multiplexer accepts up to 16 connections at once, for example a recognizer and a keyboard client, so a demo can switch between input modes without reconnecting. Further connections are closed. Commands run one at a time in the order they arrive, whichever client sent them. Each request line is executed and answered before the next line is read, so an `ok` reply means the command has run. There is no queue: nothing waits to run later. A client that disconnects mid-line loses only that partial line.
 - **Framing:** one JSON object per line, UTF-8. The multiplexer writes exactly one reply line per request line. A line longer than 4 KiB is discarded up to its newline and gets a `bad_json` reply, so a client that never sends a newline cannot grow the read buffer without bound.
 - **Unknown fields are ignored.** A request may carry fields not listed below, and the multiplexer ignores them. This lets an optional field be added within version 1 without a version bump. A missing required field, or a listed field with the wrong type or value, is still `invalid_field`.
 - **Request:**
 
   ```json
-  {"v": 1, "cmd": "focus_next", "src": "gesture", "gesture": "Pointing_Up"}
+  {"v": 1, "cmd": "split_pane", "dir": "right", "src": "gesture"}
   ```
 
   | Field | Required | Meaning |
   | --- | --- | --- |
   | `v` | yes | Protocol version, an integer. Version 1 is the only one so far. |
   | `cmd` | yes | One of the commands below. |
+  | `dir` | for `focus` and `split_pane` | `"left"`, `"right"`, `"up"`, or `"down"`. Ignored on other commands. |
   | `src` | no | `"gesture"` or `"keyboard"`. Used only for feedback and the command log. |
-  | `gesture` | no | The pose label that produced the command, shown in the status line (FR-12). |
+
+  The protocol carries no pose label. Which pose produced a command stays inside the recognizer, so the multiplexer's feedback (FR-12) shows the command, not the gesture. FR-12's wording still asks for the recognized gesture and needs updating to match.
 
   | `cmd` | Effect | Requirement |
   | --- | --- | --- |
+  | `focus` | Move focus to the nearest pane in direction `dir`. | FR-5 |
   | `focus_next` | Move focus to the next pane in tree order, wrapping at the end. | FR-5 |
-  | `split_pane` | Split the focused pane, start a login shell in the new pane, and focus it. | FR-6 |
+  | `split_pane` | Split the focused pane so the new pane opens on the `dir` side, start a login shell in it, and focus it. | FR-6 |
   | `next_layout` | Apply the next preset layout. No pane's process restarts. | FR-7 |
   | `close_pane` | Close the focused pane and end its process. | FR-8 |
 
-- **Reply:** `{"v": 1, "ok": true}` or `{"v": 1, "ok": false, "error": "<code>"}`, where `<code>` is `bad_json`, `unsupported_version`, `unknown_command`, `invalid_field`, or `busy` (a second client, above). On any error the layout is unchanged (FR-9).
+- **Reply:** `{"v": 1, "ok": true}` or `{"v": 1, "ok": false, "error": "<code>"}`, where `<code>` is `bad_json`, `unsupported_version`, `unknown_command`, or `invalid_field`. On any error the layout is unchanged (FR-9).
 - **Confidence stays in the recognizer.** The recognizer applies the thresholds before sending, including the higher one for `close_pane`. The multiplexer trusts that any well-formed intent is deliberate.
 
 ### Gesture state machine (inside the recognizer)
@@ -145,7 +148,7 @@ sequenceDiagram
     participant H as Host terminal
     U->>R: holds the focus pose
     R->>R: Idle → Candidate → Fired after min stable ms
-    R->>M: {"v":1,"cmd":"focus_next","src":"gesture",...}
+    R->>M: {"v":1,"cmd":"focus_next","src":"gesture"}
     M->>M: validate, then move focus in the layout tree
     M-->>R: {"v":1,"ok":true}
     M->>H: redraw borders and status line
