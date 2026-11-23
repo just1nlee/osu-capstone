@@ -165,8 +165,6 @@ static const char *const cmd_names[] = {
     [CMD_FOCUS] = "focus",
     [CMD_SPLIT_PANE] = "split_pane",
     [CMD_CLOSE_PANE] = "close_pane",
-    [CMD_FOCUS_NEXT] = "focus_next",
-    [CMD_NEXT_LAYOUT] = "next_layout",
 };
 static const char *const dir_names[] = {
     [DIR_NONE] = "none", [DIR_LEFT] = "left", [DIR_RIGHT] = "right",

@@ -29,8 +29,8 @@ Priority labels use MoSCoW (Must, Should, Could), ranking how much the product n
 
 ### Pane control
 
-- **FR-5** (Must: the walking skeleton is this one action): A gesture moves focus to the next pane.
-  Acceptance: with two panes open and the left one focused, the focus-next gesture moves focus to the right pane, and keyboard input then goes to the right pane.
+- **FR-5** (Must: the walking skeleton is this one action): A gesture moves focus to an adjacent pane in a chosen direction.
+  Acceptance: with two panes open and the left one focused, the focus-right gesture moves focus to the right pane, and keyboard input then goes to the right pane.
 - **FR-6** (Must: the second action a user needs after focus): A gesture splits the focused pane, starts the user's login shell in the new pane, and focuses it.
 - **FR-7** (Should: rearranging is in scope, but focus and split come first): A gesture switches the window to the next preset layout, without restarting any process running in a pane.
   Acceptance: a long-running process (for example `top`) keeps running, with the same process ID, before and after the layout change.

@@ -63,14 +63,6 @@ static void test_fr8_close_pane(void) {
     CHECK(in.dir == DIR_NONE);
 }
 
-static void test_draft_commands_kept(void) {
-    struct intent in;
-    CHECK(parse("{\"v\":1,\"cmd\":\"focus_next\"}", &in) == INTENT_OK);
-    CHECK(in.cmd == CMD_FOCUS_NEXT);
-    CHECK(parse("{\"v\":1,\"cmd\":\"next_layout\"}", &in) == INTENT_OK);
-    CHECK(in.cmd == CMD_NEXT_LAYOUT);
-}
-
 static void test_src_field(void) {
     struct intent in;
     CHECK(parse("{\"v\":1,\"cmd\":\"close_pane\",\"src\":\"gesture\"}", &in) == INTENT_OK);
@@ -86,26 +78,29 @@ static void test_fr9_bad_json(void) {
     EXPECT_ERR("", INTENT_BAD_JSON);
     EXPECT_ERR("hello", INTENT_BAD_JSON);
     EXPECT_ERR("{\"v\":1,\"cmd\":\"focus\"", INTENT_BAD_JSON);           // unterminated
-    EXPECT_ERR("{\"v\":1,,\"cmd\":\"focus_next\"}", INTENT_BAD_JSON);    // double comma
-    EXPECT_ERR("{\"v\":1,\"cmd\":\"focus_next\"} x", INTENT_BAD_JSON);   // trailing garbage
+    EXPECT_ERR("{\"v\":1,,\"cmd\":\"close_pane\"}", INTENT_BAD_JSON);    // double comma
+    EXPECT_ERR("{\"v\":1,\"cmd\":\"close_pane\"} x", INTENT_BAD_JSON);   // trailing garbage
     EXPECT_ERR("[1,2]", INTENT_BAD_JSON);
     EXPECT_ERR("{v:1}", INTENT_BAD_JSON);                                // unquoted key
 }
 
 static void test_fr9_unsupported_version(void) {
-    EXPECT_ERR("{\"v\":2,\"cmd\":\"focus_next\"}", INTENT_UNSUPPORTED_VERSION);
-    EXPECT_ERR("{\"v\":0,\"cmd\":\"focus_next\"}", INTENT_UNSUPPORTED_VERSION);
+    EXPECT_ERR("{\"v\":2,\"cmd\":\"close_pane\"}", INTENT_UNSUPPORTED_VERSION);
+    EXPECT_ERR("{\"v\":0,\"cmd\":\"close_pane\"}", INTENT_UNSUPPORTED_VERSION);
 }
 
 static void test_fr9_unknown_command(void) {
     EXPECT_ERR("{\"v\":1,\"cmd\":\"scroll\"}", INTENT_UNKNOWN_COMMAND);
     EXPECT_ERR("{\"v\":1,\"cmd\":\"\"}", INTENT_UNKNOWN_COMMAND);
+    // Removed from the draft protocol; no longer supported.
+    EXPECT_ERR("{\"v\":1,\"cmd\":\"focus_next\"}", INTENT_UNKNOWN_COMMAND);
+    EXPECT_ERR("{\"v\":1,\"cmd\":\"next_layout\"}", INTENT_UNKNOWN_COMMAND);
 }
 
 static void test_fr9_invalid_field(void) {
-    EXPECT_ERR("{\"cmd\":\"focus_next\"}", INTENT_INVALID_FIELD);                 // missing v
-    EXPECT_ERR("{\"v\":\"1\",\"cmd\":\"focus_next\"}", INTENT_INVALID_FIELD);     // v not int
-    EXPECT_ERR("{\"v\":1.0,\"cmd\":\"focus_next\"}", INTENT_INVALID_FIELD);       // v not int
+    EXPECT_ERR("{\"cmd\":\"close_pane\"}", INTENT_INVALID_FIELD);                 // missing v
+    EXPECT_ERR("{\"v\":\"1\",\"cmd\":\"close_pane\"}", INTENT_INVALID_FIELD);     // v not int
+    EXPECT_ERR("{\"v\":1.0,\"cmd\":\"close_pane\"}", INTENT_INVALID_FIELD);       // v not int
     EXPECT_ERR("{\"v\":1}", INTENT_INVALID_FIELD);                                // missing cmd
     EXPECT_ERR("{\"v\":1,\"cmd\":7}", INTENT_INVALID_FIELD);                      // cmd not string
     EXPECT_ERR("{\"v\":1,\"cmd\":\"focus\"}", INTENT_INVALID_FIELD);              // missing dir
@@ -136,7 +131,6 @@ int main(void) {
     test_fr5_focus_each_direction();
     test_fr6_split_pane_each_direction();
     test_fr8_close_pane();
-    test_draft_commands_kept();
     test_src_field();
     test_fr9_bad_json();
     test_fr9_unsupported_version();
