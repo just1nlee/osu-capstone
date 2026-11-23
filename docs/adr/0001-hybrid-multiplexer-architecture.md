@@ -6,7 +6,7 @@
 
 ## Context and Problem Statement
 
-The multiplexer core starts in Sprint 2, and its language, the command protocol, gesture feedback, and the rendering tests all depend on what the multiplexer is. Which code owns terminal state is hard to reverse, because changing it later means rewriting the PTY handling, the rendering, and the tests built on both. The full analysis is in [RFC-001](../rfcs/2026-10-25-rfc-draft-justin.md).
+The multiplexer core starts in Sprint 2, and its language, the command protocol, gesture feedback, and the rendering tests all depend on what the multiplexer is. Which code owns terminal state is hard to reverse, because changing it later means rewriting the PTY handling, the rendering, and the tests built on both. The full analysis is in [RFC-001](../rfcs/2026-11-22-rfc-final-justin.md).
 
 ## Considered Options
 
