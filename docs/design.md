@@ -87,7 +87,7 @@ One process with five modules. Each can be tested without a real terminal (NFR-7
 
 ### Intent protocol (recognizer to multiplexer)
 
-This is the contract three components build against, so it is the most expensive thing in this document to change (R-4). It is a **draft until both container owners approve it** in the pull request that adds the schema file, its snapshot test, and the CODEOWNERS entry. That pull request was due 2026-11-10 and has not merged, so the R-4 trigger has fired. Until it merges, nothing should be built against this protocol beyond the walking skeleton's `focus_next`. After it merges, any change needs both owners' review through CODEOWNERS.
+This is the contract three components build against, so it is the most expensive thing in this document to change (R-4). It is a **draft until both container owners approve it** in the pull request that adds the schema file, its snapshot test, and the CODEOWNERS entry. That pull request was due 2026-11-10 and has not merged, so the R-4 trigger has fired. Until it merges, nothing should be built against this protocol beyond the walking skeleton's `focus`. After it merges, any change needs both owners' review through CODEOWNERS.
 
 - **Transport:** a Unix domain socket at `$TMPDIR/gesturemux-$UID/control.sock`, in a directory with mode `0700`, so only the user running the multiplexer can connect (NFR-6).
 - **Socket lifecycle:** on startup the multiplexer tries to connect to an existing `control.sock`. If that succeeds, another multiplexer owns it, so this one exits with an error. If it fails, the file is stale from a crash, so the multiplexer removes it and creates a new one. It removes the socket on a clean exit.
@@ -112,9 +112,7 @@ This is the contract three components build against, so it is the most expensive
   | `cmd` | Effect | Requirement |
   | --- | --- | --- |
   | `focus` | Move focus to the nearest pane in direction `dir`. | FR-5 |
-  | `focus_next` | Move focus to the next pane in tree order, wrapping at the end. | FR-5 |
   | `split_pane` | Split the focused pane so the new pane opens on the `dir` side, start a login shell in it, and focus it. | FR-6 |
-  | `next_layout` | Apply the next preset layout. No pane's process restarts. | FR-7 |
   | `close_pane` | Close the focused pane and end its process. | FR-8 |
 
 - **Reply:** `{"v": 1, "ok": true}` or `{"v": 1, "ok": false, "error": "<code>"}`, where `<code>` is `bad_json`, `unsupported_version`, `unknown_command`, or `invalid_field`. On any error the layout is unchanged (FR-9).
@@ -138,7 +136,7 @@ stateDiagram-v2
 
 Time is measured from frame timestamps, not frame counts, so the machine behaves the same at 15 fps and 30 fps (FR-4). The threshold, the destructive-command threshold, the stability time, and the release time are config values, not constants. The unit tests include a held pose with a one-frame dropout, which must emit exactly one command.
 
-### Key scenario: focus the next pane (the walking skeleton)
+### Key scenario: focus the pane to the right (the walking skeleton)
 
 ```mermaid
 sequenceDiagram
@@ -148,7 +146,7 @@ sequenceDiagram
     participant H as Host terminal
     U->>R: holds the focus pose
     R->>R: Idle → Candidate → Fired after min stable ms
-    R->>M: {"v":1,"cmd":"focus_next","src":"gesture"}
+    R->>M: {"v":1,"cmd":"focus","dir":"right","src":"gesture"}
     M->>M: validate, then move focus in the layout tree
     M-->>R: {"v":1,"ok":true}
     M->>H: redraw borders and status line
@@ -192,7 +190,7 @@ Each is deferred on purpose because it is cheap to reverse or not needed for the
 - **The recognizer's language and how it is packaged** into a release that installs on a machine without a development setup. Needed before the first pre-release, 2026-11-22.
 - **Gesture classification: MediaPipe's predefined gestures or our own classifier on landmarks.** This is an open question in the requirements, answered by the R-2 spike. Only the recognizer's internals change, because the intent protocol does not carry poses as commands.
 - **Which pose maps to which command.** It is a config value, so it can change without touching code.
-- **Preset layouts for `next_layout`:** which ones, and in what order.
+- **Preset layouts (FR-7):** the protocol has no layout command yet. The command, and which layouts it cycles through in what order, are still to be designed.
 - **Config file format and location** (FR-15).
 - **The companion app's internals**, including how the debug view receives frames without breaking NFR-5. Winter.
 - **Linux support and code signing.** These are open questions in the requirements and R-9.

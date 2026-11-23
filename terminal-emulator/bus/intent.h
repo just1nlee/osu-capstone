@@ -12,8 +12,6 @@ enum intent_cmd {
     CMD_FOCUS,       // move focus in a direction (needs dir)
     CMD_SPLIT_PANE,  // spawn a pane in a direction (needs dir)
     CMD_CLOSE_PANE,
-    CMD_FOCUS_NEXT,
-    CMD_NEXT_LAYOUT,
 };
 
 enum intent_dir { DIR_NONE, DIR_LEFT, DIR_RIGHT, DIR_UP, DIR_DOWN };
