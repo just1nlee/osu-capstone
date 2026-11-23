@@ -102,13 +102,14 @@ def print_live_result(
     )
 
 
-def run_live_stream(model_path: Path) -> None:
+def run_live_stream(model_path: Path, result_callback=None) -> None:
     """Read webcam frames until the user presses Q or closes the window."""
+    callback = result_callback or print_live_result
     options = mp.tasks.vision.GestureRecognizerOptions(
         base_options=mp.tasks.BaseOptions(model_asset_path=str(model_path)),
         running_mode=RUNNING_MODE,
         num_hands=2,
-        result_callback=print_live_result,
+        result_callback=callback,
     )
 
     camera = cv2.VideoCapture(0)
