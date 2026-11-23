@@ -1,0 +1,21 @@
+:root { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #182435; font-size: 15px; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #e8edf1; transition: background .25s; }
+body[data-color="red"] { background: #d85958; } body[data-color="yellow"] { background: #e8c85b; } body[data-color="blue"] { background: #5688c8; } body[data-color="green"] { background: #64a97f; }
+main { max-width: 1200px; margin: auto; padding: 30px 36px 40px; }
+header { margin-bottom: 22px; } h1, h2, p { margin: 0; } h1 { font-size: 30px; letter-spacing: -.04em; } h2 { font-size: 18px; letter-spacing: -.02em; } header p:last-child, .card p { color: #59697b; margin-top: 6px; } .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .14em; margin-bottom: 8px; }
+.card { background: #fff; border: 1px solid #d9e0e6; border-radius: 14px; padding: 22px; box-shadow: 0 5px 20px #14273a0c; }
+.section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; } .badge { background: #edf2f5; border-radius: 99px; padding: 7px 11px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.color-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 20px 3px 14px; }.color { border: 3px solid transparent; border-radius: 10px; height: 76px; color: #fff; font: inherit; font-weight: 750; cursor: pointer; }.color.red { background: #bd4042; }.color.yellow { background: #edc952; color: #332b11; }.color.blue { background: #386cae; }.color.green { background: #338558; }.color.selected { outline: 3px solid #182435; outline-offset: 3px; }.color:focus-visible, input:focus-visible { outline: 3px solid #213e75; outline-offset: 4px; }.hint { font-size: 12px; line-height: 1.5; }.hint span { padding: 0 5px; }
+.columns { display: grid; grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr); gap: 18px; margin-top: 18px; }.toggle { font-size: 12px; font-weight: 700; display: flex; gap: 7px; align-items: center; white-space: nowrap; }.toggle input { accent-color: #346b9b; }.camera-layout { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(150px, .75fr); gap: 18px; margin-top: 19px; }.preview { background: #17232d; border-radius: 9px; aspect-ratio: 4 / 3; display: grid; place-items: center; overflow: hidden; position: relative; }.preview video { width: 100%; height: 100%; object-fit: cover; position: absolute; }.preview p { color: #d3dce3; z-index: 1; font-size: 13px; }.details { margin: 0; font-size: 12px; }.details div { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid #edf0f2; }.details dt { color: #647284; }.details dd { margin: 0; font-weight: 700; text-align: right; }.error:not(:empty) { color: #a4262c; font-weight: 650; margin-top: 12px; }.settings > p { margin-bottom: 20px; }.settings label { display: flex; justify-content: space-between; margin-top: 17px; font-size: 12px; font-weight: 700; }.settings output { color: #386b91; }.settings input { width: 100%; accent-color: #386b91; margin: 9px 0 0; }
+@media (max-width: 850px) { main { padding: 24px; }.columns { grid-template-columns: 1fr; }.camera-layout { grid-template-columns: 1fr 1fr; } }
+
+.diagnostics { margin-top: 18px; }
+.diagnostics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+.diagnostic-heading { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.diagnostic-heading h3 { font-size: 14px; margin: 0; }
+.diagnostic-heading label, .diagnostic-heading span { color: #59697b; font-size: 12px; }
+.diagnostic-heading label { display: flex; align-items: center; gap: 5px; }
+.plain-button { background: #edf2f5; border: 1px solid #d4dde4; border-radius: 7px; color: #182435; padding: 7px 11px; cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; }
+.diagnostics pre { height: 300px; overflow: auto; background: #17232d; color: #e0eaf1; border-radius: 8px; padding: 12px; font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 850px) { .diagnostics-grid { grid-template-columns: 1fr; } }

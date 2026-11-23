@@ -6,7 +6,7 @@ Project 60, Vision-Based Gesture Control for Terminal Multiplexers. CS 461/462, 
 
 **Sprint key:** Sprint 1 = weeks 3 to 4. Sprint 2 = weeks 5 to 6. Sprint 3 = weeks 7 to 8. Sprint 4 = weeks 9 to 10.
 
-The repository holds documents only so far, and the stack is not settled. Anything below marked **Not yet built** does not exist today, and each one names who writes it and which sprint it lands in. Do not assume a command runs because it appears here.
+The architecture is decided in [ADR-0001](docs/adr/0001-hybrid-multiplexer-architecture.md) and described in `docs/design.md`; product code has not started, and `playground/mediapipe-example` is the checkpoint scaffold. Anything below marked **Not yet built** does not exist today, and each one names who writes it and which sprint it lands in. Do not assume a command runs because it appears here.
 
 ## Code of Conduct
 
@@ -16,12 +16,12 @@ Raise a concern with the person directly, or with Havel Konda, Project Manager. 
 
 ## Getting Started
 
-Prerequisites, setup steps, and the command to run the app: **Not yet built.** Justin writes this section in Sprint 1, as the first code lands.
+See the root `README.md` for the checkpoint scaffold setup, launch, and test commands. Product setup is not yet defined; Justin writes it when the product code lands.
 
 What works today:
 
 ```bash
-git clone https://github.com/just1nlee/gesture-control-mux.git
+git clone https://github.com/just1nlee/osu-capstone.git
 ```
 
 **Secrets.** Keep secrets in a local `.env` file. `.env` is gitignored and never committed. Commit a `.env.example` with placeholder keys so a new contributor knows which variables to set. Justin adds both in Sprint 1.
@@ -57,14 +57,14 @@ Reference the issue in the pull request body with `Closes #42`, not in the commi
 
 ## Code Style, Linting & Formatting
 
-Formatter, linter, config file locations, and the commands to check and fix locally: **Not yet built.** Justin chooses the tools and writes this section in Sprint 1, once the stack is settled.
+Formatter, linter, config file locations, and the commands to check and fix locally: **Not yet built.** Justin chooses the tools and writes this section with the first multiplexer code, in Sprint 2.
 
 Until then, match the style of the code around you and do not reformat files you are not otherwise changing.
 
 ## Testing
 
 - Ship a test in the same pull request as any change that adds or alters behavior. Formatting, docs, and comment changes need none.
-- Test types, the commands to run them, and the coverage threshold: **Not yet built.** Justin writes the commands in Sprint 1 and sets the coverage threshold in Sprint 2.
+- Run `npm test`, `npm run test:tmux`, and `npm run test:app:ci` from `playground/mediapipe_tmux_companion` to reproduce the [companion checks in CI](playground/mediapipe_tmux_companion/README.md#verify). Run `npm test` from `playground/mediapipe-example` for local scaffold tests. Product test types and coverage thresholds are not yet defined; Justin owns those decisions.
 - No coverage threshold applies before Sprint 2. Enforcing one against an empty suite measures nothing.
 
 ## Definition of Done
@@ -73,7 +73,7 @@ A change merges only when every check below passes. A check marked **Not yet bui
 
 | Check                              | Enforced by                                              | Status        | Lands    | Owner             |
 | ---------------------------------- | -------------------------------------------------------- | ------------- | -------- | ----------------- |
-| Automated tests pass               | CI job `test` in `.github/workflows/ci.yml`              | Not yet built | Sprint 1 | Justin Lee        |
+| Automated tests pass               | CI job `test` in `.github/workflows/ci.yml`              | Companion     | Sprint 1 | Justin Lee        |
 | Lint and format clean              | CI job `lint` in `.github/workflows/ci.yml`              | Not yet built | Sprint 1 | Justin Lee        |
 | One approving review               | Branch protection rule on `main`                         | Not yet built | Sprint 1 | Justin Lee        |
 | Linked to an issue                 | Pull request template checkbox, `Closes #N`              | Not yet built | Sprint 1 | Havel Konda       |
@@ -112,7 +112,7 @@ Keep the norm workable: size issues to one sprint, review within 24 weekday hour
 
 ## CI/CD
 
-- Pipeline definition: `.github/workflows/ci.yml`. **Not yet built.** Justin adds it in Sprint 1.
+- On pull requests and pushes to any branch, the `test` job in `.github/workflows/ci.yml` runs the companion's unit tests, disposable tmux integration tests, and Electron smoke test on macOS. The smoke test feeds a synthetic gesture through the companion to real tmux. It needs no webcam, model file, or inference. A passing GitHub Actions run on the submitted commit is still required for checkpoint evidence.
 - Mandatory jobs as each lands: `test` and `lint` in Sprint 1, `security` in Sprint 2.
 - Read logs and re-run failed jobs from the Actions tab of the repository.
 - Nothing merges to `main` with a failing required job. CI red on `main` for more than 48 hours triggers the conflict path in the Team Charter.
