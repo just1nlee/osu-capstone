@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediaPipe tmux Companion</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/main.js"></script>
+</head>
+<body>
+  <header class="toolbar">
+    <h1>Gesture companion</h1>
+    <div class="session-tools">
+      <label for="session-picker">tmux session</label>
+      <select id="session-picker" disabled><option value="">Checking for sessions…</option></select>
+      <button id="refresh-sessions">Refresh sessions</button>
+    </div>
+    <div class="camera-tools">
+      <output id="camera-status" aria-live="polite">Camera off</output>
+      <button id="camera-toggle" class="primary" disabled>Turn camera on</button>
+    </div>
+    <p id="session-message" class="session-message" role="status"></p>
+  </header>
+  <main class="workspace">
+    <section id="mediapipe" class="panel" aria-labelledby="mediapipe-heading">
+      <h2 id="mediapipe-heading">MediaPipe</h2>
+        <div class="camera-preview">
+          <video id="gesture-video" autoplay playsinline muted aria-label="Local camera preview"></video>
+          <span id="preview-placeholder">Camera is off</span>
+        </div>
+        <p id="camera-error" role="alert"></p>
+        <dl class="recognition-stats">
+          <div><dt>Gesture</dt><dd id="gesture">No hand detected</dd></div>
+          <div><dt>Confidence</dt><dd id="confidence">—</dd></div>
+          <div><dt>Control</dt><dd id="control-status">Disabled</dd></div>
+          <div><dt>State</dt><dd id="state">Ready</dd></div>
+          <div><dt>Progress</dt><dd id="progress">0 / 2 frames</dd></div>
+          <div><dt>Cooldown</dt><dd id="cooldown">0.0 s</dd></div>
+          <div class="last-action"><dt>Last action</dt><dd id="last-action">None yet</dd></div>
+        </dl>
+        <fieldset class="gesture-tuning">
+          <legend>Gesture settings</legend>
+          <label for="fps">Recognition FPS <output id="fps-value" for="fps">5</output></label>
+          <input id="fps" data-gesture-setting="fps" type="range" min="1" max="30" step="1" value="5">
+          <label for="confidence-setting">Minimum confidence <output id="confidence-setting-value" for="confidence-setting">0.70</output></label>
+          <input id="confidence-setting" data-gesture-setting="confidence" type="range" min="0.50" max="0.95" step="0.05" value="0.70">
+          <label for="frames">Consecutive frames <output id="frames-value" for="frames">2</output></label>
+          <input id="frames" data-gesture-setting="frames" type="range" min="1" max="10" step="1" value="2">
+          <label for="cooldown-setting">Gesture cooldown <output id="cooldown-setting-value" for="cooldown-setting">1000 ms</output></label>
+          <input id="cooldown-setting" data-gesture-setting="cooldown" type="range" min="0" max="3000" step="100" value="1000">
+        </fieldset>
+        <div class="debug-output">
+          <div class="debug-heading">
+            <h3>Latest model output</h3>
+            <label><input id="freeze-output" type="checkbox"> Freeze output</label>
+          </div>
+          <p id="result-meta">Waiting for inference</p>
+          <pre id="model-output" tabindex="0">No model output yet.</pre>
+          <div class="debug-heading">
+            <h3>Recognition log</h3>
+            <button id="clear-log" type="button">Clear log</button>
+          </div>
+          <p>Latest 100 entries, newest first</p>
+          <pre id="diagnostic-log" tabindex="0">No events yet.</pre>
+        </div>
+    </section>
+    <section id="settings" class="panel" aria-labelledby="settings-heading">
+      <div class="settings-heading">
+        <h2 id="settings-heading">Gesture mappings</h2>
+        <button id="refresh-commands" type="button">Refresh commands</button>
+      </div>
+      <p id="catalog-message" role="status"></p>
+      <div id="gesture-rows"></div>
+      <div class="mapping-footer">
+        <label class="guard-control"><input id="close-lock" type="checkbox" disabled> Allow closing and guarded commands</label>
+        <p class="guard-hint">Guarded commands require a continuous one-second hold.</p>
+        <div class="save-controls">
+          <button id="save-mappings" type="button" class="primary" disabled>Save mappings</button>
+          <p id="settings-message" role="status"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

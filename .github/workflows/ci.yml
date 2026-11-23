@@ -1,4 +1,4 @@
-name: Scaffold CI
+name: Companion CI
 
 on:
   pull_request:
@@ -13,13 +13,21 @@ jobs:
     timeout-minutes: 10
     defaults:
       run:
-        working-directory: playground/mediapipe-example
+        working-directory: playground/mediapipe_tmux_companion
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 22
+      - name: Ensure tmux is available
+        run: |
+          command -v tmux >/dev/null || brew install tmux
+          tmux -V
       - name: Install dependencies
         run: npm ci
-      - name: Launch scaffold and run behavior tests
+      - name: Run companion unit tests
         run: npm test
+      - name: Run real tmux integration tests
+        run: npm run test:tmux
+      - name: Verify Electron IPC and gesture dispatch with a synthetic recognizer
+        run: npm run test:app:ci
