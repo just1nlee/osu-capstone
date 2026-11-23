@@ -10,7 +10,8 @@
     "start": "electron .",
     "test": "node --test tests/session.test.cjs tests/config.test.mjs tests/commands.test.mjs tests/gesture-gate.test.mjs tests/dispatch.test.cjs tests/protocol.test.cjs",
     "test:tmux": "node --test tests/tmux.integration.test.cjs",
-    "test:app": "electron tests/app.test.cjs"
+    "test:app": "electron tests/app.test.cjs",
+    "test:app:ci": "electron tests/app.test.cjs --without-model"
   },
   "dependencies": { "@mediapipe/tasks-vision": "0.10.35" },
   "devDependencies": { "electron": "45.1.0" }

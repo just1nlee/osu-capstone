@@ -110,16 +110,18 @@ On a bad settings file, the app opens with defaults and leaves the file on disk.
 
 ## Verify
 
-Run these from the companion directory. The [repository CI workflow](../../.github/workflows/ci.yml) runs the original MediaPipe example. Run the companion suites locally.
+Run these from the companion directory after `npm ci`. The [repository CI workflow](../../.github/workflows/ci.yml) runs the first three suites on macOS with Node.js 22 and tmux. No webcam or shared model file is required for those checks.
 
 ~~~sh
 npm test
 npm run test:tmux
+npm run test:app:ci
 npm run test:app
 ~~~
 
 - **npm test** covers selection, persistence, command preparation, gesture stabilization, hold timing, and shared model routing.
 - **npm run test:tmux** uses real disposable tmux servers to check discovery, target resolution, pane moves, error reporting, close safeguards, and launcher session reuse.
+- **npm run test:app:ci** launches Electron and uses a synthetic recognizer to feed gesture results through the renderer, IPC, and dispatcher. It verifies that a held gesture changes focus once in a real tmux session with an attached client, even when the companion window is hidden. It also checks discovery, settings persistence, and tmux survival on quit. Run it locally on a graphical macOS desktop with Python 3 and tmux.
 - **npm run test:app** needs the shared model file, a graphical macOS desktop, Python 3, and a real tmux binary. It checks Electron startup, IPC, settings, local MediaPipe inference with generated video, and background dispatch with a tmux client attached to a test PTY. It injects a synthetic pose label into one part of the test. A physical-camera and real-pose check is a separate manual step.
 - Set `TMUX_TEST_BINARY` to the absolute path of a tmux executable to run against that version. Without it, the integration suite resolves tmux through its normal binary lookup, and the app smoke test uses tmux on `PATH`.
 
